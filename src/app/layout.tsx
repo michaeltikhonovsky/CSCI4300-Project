@@ -6,7 +6,10 @@ import { gaegu } from "@/lib/font";
 
 export const metadata: Metadata = {
   title: "UGA Bus Tracker",
-  description: "Track UGA buses in real-time",
+  description: "Bet on UGA bus ETA",
+  icons: {
+    icon: "/uga_bus_logo.png",
+  },
 };
 
 export default function RootLayout({
