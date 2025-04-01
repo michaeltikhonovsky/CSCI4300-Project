@@ -82,14 +82,29 @@ export default function Home() {
         <h1 className="mb-8 text-center text-6xl font-bold text-white md:text-9xl">
           UGA Bus Tracker
         </h1>
-
-        <Link
-          href="/bus-map"
-          className="no-cursor group relative flex items-center gap-2 overflow-hidden rounded-lg border-2 border-blue-500 bg-black/50 px-8 py-4 text-white transition-all hover:border-blue-400 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
-        >
-          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-blue-950/50 to-transparent transition-opacity group-hover:opacity-100" />
-          <span className="text-3xl">Bet on the Buses</span>
-        </Link>
+        <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/bus-map"
+            className="no-cursor group relative flex items-center gap-2 overflow-hidden rounded-lg border-2 border-blue-500 bg-black/50 px-8 py-2 text-white transition-all hover:border-blue-400 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+          >
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-blue-950/50 to-transparent transition-opacity group-hover:opacity-100" />
+            <span className="text-3xl">Bet on the Buses</span>
+          </Link>
+          <Link
+            href="/leaderboard"
+            className="no-cursor group relative flex items-center gap-2 overflow-hidden rounded-lg border-2 border-purple-500 bg-black/50 px-8 py-2 text-white transition-all hover:border-purple-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+          >
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-950/50 to-transparent transition-opacity group-hover:opacity-100" />
+            <span className="text-3xl">Leaderboard</span>
+          </Link>
+          <Link
+            href="/auth"
+            className="no-cursor group relative flex items-center gap-2 overflow-hidden rounded-lg border-2 border-green-500 bg-black/50 px-8 py-2 text-white transition-all hover:border-green-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+          >
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-green-950/50 to-transparent transition-opacity group-hover:opacity-100" />
+            <span className="text-3xl">Join</span>
+          </Link>
+        </div>
       </div>
     </div>
   );

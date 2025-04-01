@@ -2,11 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { TRPCProvider } from "@/utils/trpc-provider";
-
-const gaegu = localFont({
-  src: "../../public/fonts/Gaegu-Regular.ttf",
-  variable: "--font-gaegu",
-});
+import { gaegu } from "@/lib/font";
 
 export const metadata: Metadata = {
   title: "UGA Bus Tracker",
@@ -15,12 +11,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body className={`${gaegu.variable} font-gaegu antialiased`}>
+    <html lang="en" className={`${gaegu.variable}`}>
+      <body className={"font-gaegu"}>
         <TRPCProvider>{children}</TRPCProvider>
       </body>
     </html>
