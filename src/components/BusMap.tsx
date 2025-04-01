@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   GoogleMap,
   LoadScript,
@@ -42,6 +42,8 @@ export default function BusMap() {
   const [isLoading, setIsLoading] = useState(false);
   const [busLocation, setBusLocation] = useState<BusLocation | null>(null);
   const [tracker, setTracker] = useState<LiveBusTracker | null>(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [loadError, setLoadError] = useState<Error | null>(null);
 
   useEffect(() => {
     return () => {
@@ -89,35 +91,68 @@ export default function BusMap() {
     }
   };
 
+  const handleMapLoad = useCallback(() => {
+    setIsMapLoaded(true);
+  }, []);
+
+  const handleMapError = useCallback((error: Error) => {
+    console.error("Error loading Google Maps:", error);
+    setLoadError(error);
+  }, []);
+
+  if (loadError) {
+    return (
+      <div className="w-full max-w-4xl mx-auto p-4 text-center text-white">
+        <p>Error loading map. Please refresh the page.</p>
+        <p className="text-sm text-gray-400">{loadError.message}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
       <LoadScript
         googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
+        onLoad={() => console.log("Script loaded successfully")}
+        onError={handleMapError}
+        loadingElement={<div></div>}
       >
-        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={14}>
-          {directions && <DirectionsRenderer directions={directions} />}
-          {busLocation && (
-            <Marker
-              position={busLocation}
-              icon={{
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 8,
-                fillColor: "#4285F4",
-                fillOpacity: 1,
-                strokeColor: "#ffffff",
-                strokeWeight: 2,
-              }}
-              label={{
-                text: etaInfo?.vehicleName || "",
-                color: "#000000",
-                fontSize: "18px",
-              }}
-            />
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={center}
+          zoom={14}
+          onLoad={handleMapLoad}
+        >
+          {isMapLoaded && (
+            <>
+              {directions && <DirectionsRenderer directions={directions} />}
+              {busLocation && (
+                <Marker
+                  position={busLocation}
+                  icon={{
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 8,
+                    fillColor: "#4285F4",
+                    fillOpacity: 1,
+                    strokeColor: "#ffffff",
+                    strokeWeight: 2,
+                  }}
+                  label={{
+                    text: etaInfo?.vehicleName || "",
+                    color: "#000000",
+                    fontSize: "18px",
+                  }}
+                />
+              )}
+            </>
           )}
         </GoogleMap>
       </LoadScript>
 
       <div className="mt-4 flex flex-col items-center gap-4">
+        {!isMapLoaded && (
+          <div className="text-white text-center">Loading map...</div>
+        )}
         <button
           onClick={handleGetETA}
           disabled={isLoading}
