@@ -130,17 +130,8 @@ export default function BusMap() {
                 <Marker
                   position={busLocation}
                   icon={{
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 8,
-                    fillColor: "#4285F4",
-                    fillOpacity: 1,
-                    strokeColor: "#ffffff",
-                    strokeWeight: 2,
-                  }}
-                  label={{
-                    text: etaInfo?.vehicleName || "",
-                    color: "#000000",
-                    fontSize: "18px",
+                    url: "/bus_icon.png",
+                    scaledSize: new google.maps.Size(36, 36),
                   }}
                 />
               )}
