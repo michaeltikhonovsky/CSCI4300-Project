@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function BusMapPage() {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-black">
+    <div className="fixed inset-0 w-full bg-black">
       {/* Background Image with Vignette */}
       <div className="fixed inset-0">
         <img
@@ -17,7 +17,7 @@ export default function BusMapPage() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex min-h-screen flex-col p-8">
+      <div className="relative z-10 flex h-screen flex-col p-8">
         <div className="flex items-center gap-4 mb-8">
           <Link href="/">
             <img

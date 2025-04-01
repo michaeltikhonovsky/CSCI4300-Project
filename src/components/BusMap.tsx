@@ -164,7 +164,6 @@ export default function BusMap() {
         {etaInfo && (
           <div className="p-4 bg-white rounded shadow">
             <h3 className="font-bold mb-2 text-black">ETA Information</h3>
-            <p className="text-black">Bus: {etaInfo.vehicleName}</p>
             <p className="text-black">Stop: {etaInfo.stopName}</p>
             <p className="text-black">Distance: {etaInfo.distance}</p>
             <p className="text-black">Duration: {etaInfo.duration}</p>
