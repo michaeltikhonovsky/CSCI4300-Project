@@ -78,7 +78,7 @@ export default function BusMap() {
               });
             }
           },
-          1500
+          500
         );
 
         setTracker(newTracker);
