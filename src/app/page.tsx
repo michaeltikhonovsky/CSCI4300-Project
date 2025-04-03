@@ -4,6 +4,7 @@ import { motion, useSpring } from "framer-motion";
 import throttle from "lodash/throttle";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import connectMongoDB from "../../config/mongodb";
 
 const BouncyCursor = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -63,6 +64,7 @@ const BouncyCursor = () => {
 };
 
 export default function Home() {
+  connectMongoDB();
   return (
     <div className="no-cursor relative min-h-screen w-full overflow-hidden bg-black">
       <BouncyCursor />
