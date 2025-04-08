@@ -98,9 +98,12 @@ export default function Home() {
         </Link>
       </header>
       <div className="relative z-10 flex h-screen flex-col items-center justify-center">
-        <h1 className="mb-8 text-center text-6xl font-bold text-white md:text-9xl">
+        <h1 className="mb-4 text-center text-6xl font-bold text-white md:text-9xl">
           UGA Bus Tracker
         </h1>
+        <p className="text-center text-white mb-8 text-2xl">
+          Bet on whether or not the UGA buses will arrive on time!
+        </p>
         <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-3">
           <Link
             href="/bus-map"

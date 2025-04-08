@@ -9,7 +9,7 @@ export default function NotFound() {
         href="/"
         className={buttonVariants({
           size: "lg",
-          className: "text-2xl p-6 bg-white text-black",
+          className: "text-2xl p-6 bg-black text-white",
         })}
       >
         Return Home
