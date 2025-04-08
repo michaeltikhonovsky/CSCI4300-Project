@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   GoogleMap,
   LoadScript,
   DirectionsRenderer,
   Marker,
+  useJsApiLoader,
 } from "@react-google-maps/api";
 import { getRandomBusToStopETA } from "@/lib/passiogo/get_eta";
 import { LiveBusTracker } from "@/lib/passiogo/live_bus_tracking";
@@ -44,6 +45,27 @@ export default function BusMap() {
   const [tracker, setTracker] = useState<LiveBusTracker | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [loadError, setLoadError] = useState<Error | null>(null);
+
+  // Use the useJsApiLoader hook instead of LoadScript component
+  const { isLoaded, loadError: apiLoadError } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+  });
+
+  // Set loadError if API loading fails
+  useEffect(() => {
+    if (apiLoadError) {
+      console.error("Error loading Google Maps API:", apiLoadError);
+      setLoadError(new Error("Failed to load Google Maps API"));
+    }
+  }, [apiLoadError]);
+
+  // Check if Google Maps API is already loaded
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.google && window.google.maps) {
+      setIsMapLoaded(true);
+    }
+  }, [isLoaded]);
 
   useEffect(() => {
     return () => {
@@ -111,12 +133,9 @@ export default function BusMap() {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
-      <LoadScript
-        googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}
-        onLoad={() => console.log("Script loaded successfully")}
-        onError={handleMapError}
-        loadingElement={<div></div>}
-      >
+      {!isLoaded ? (
+        <div className="text-white text-center">Loading Google Maps API...</div>
+      ) : (
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={center}
@@ -138,19 +157,21 @@ export default function BusMap() {
             </>
           )}
         </GoogleMap>
-      </LoadScript>
+      )}
 
       <div className="mt-4 flex flex-col items-center gap-4">
-        {!isMapLoaded && (
-          <div className="text-white text-center">Loading map...</div>
+        {!isMapLoaded && isLoaded && (
+          <div className="text-white text-center">Initializing map...</div>
         )}
-        <button
-          onClick={handleGetETA}
-          disabled={isLoading}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-        >
-          {isLoading ? "Loading..." : "Get Random Bus ETA"}
-        </button>
+        {isMapLoaded && (
+          <button
+            onClick={handleGetETA}
+            disabled={isLoading}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+          >
+            {isLoading ? "Loading..." : "Get Random Bus ETA"}
+          </button>
+        )}
 
         {etaInfo && (
           <div className="p-4 bg-white rounded shadow">
