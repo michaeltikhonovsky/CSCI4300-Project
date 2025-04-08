@@ -5,7 +5,7 @@ import throttle from "lodash/throttle";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import connectMongoDB from "../../config/mongodb";
-
+import Image from "next/image";
 const BouncyCursor = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isHovering, setIsHovered] = useState(false);
@@ -80,6 +80,23 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
+      <header className="flex items-center justify-between px-4 py-2">
+        <Image
+          className="h-16 w-16 rounded-full border-2 border-white"
+          src="/uga_bus_logo.png"
+          alt="UGA Bus Logo"
+          width={100}
+          height={100}
+        />
+
+        <Link
+          href="/auth"
+          className="no-cursor group relative flex items-center gap-2 overflow-hidden rounded-lg border-2 border-green-500 bg-black/50 px-8 py-2 text-white transition-all hover:border-green-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-green-950/5 0 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+          <span className="text-3xl">Join</span>
+        </Link>
+      </header>
       <div className="relative z-10 flex h-screen flex-col items-center justify-center">
         <h1 className="mb-8 text-center text-6xl font-bold text-white md:text-9xl">
           UGA Bus Tracker
@@ -99,13 +116,13 @@ export default function Home() {
             <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-950/50 to-transparent transition-opacity group-hover:opacity-100" />
             <span className="text-3xl">Leaderboard</span>
           </Link>
-          <Link
+          {/* <Link
             href="/auth"
             className="no-cursor group relative flex items-center gap-2 overflow-hidden rounded-lg border-2 border-green-500 bg-black/50 px-8 py-2 text-white transition-all hover:border-green-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
           >
-            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-green-950/50 to-transparent transition-opacity group-hover:opacity-100" />
+            <div className="absolute inset-0 bg-gradient-to-r from-green-950/50 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <span className="text-3xl">Join</span>
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>
