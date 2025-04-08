@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import connectMongoDB from "../../../config/mongodb";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";

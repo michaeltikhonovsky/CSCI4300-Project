@@ -7,8 +7,6 @@ import { useEffect, useState, useRef } from "react";
 import connectMongoDB from "../../config/mongodb";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import ProfileModal from "@/components/ProfileModal";
-import ProfileAvatar from "@/components/ProfileAvatar";
 import UserDropdown from "@/components/UserDropdown";
 
 const BouncyCursor = () => {

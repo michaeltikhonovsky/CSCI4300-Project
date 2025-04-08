@@ -2,7 +2,6 @@
 
 import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
-import Image from "next/image";
 import ProfileAvatar from "./ProfileAvatar";
 
 interface ProfileModalProps {
