@@ -101,6 +101,23 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     }
   }, [user]);
 
+  // Close modal with escape key
+  useEffect(() => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("keydown", handleEscapeKey);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleEscapeKey);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen || !user) return null;
 
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -281,13 +298,24 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
               accept="image/jpeg, image/png, image/gif"
               className="hidden"
             />
-            <button
-              type="button"
-              onClick={triggerFileInput}
-              className="text-sm text-white hover:text-gray-300"
-            >
-              Upload Photo
-            </button>
+            <div className="flex space-x-4">
+              <button
+                type="button"
+                onClick={triggerFileInput}
+                className="text-sm text-white hover:text-gray-300 cursor-pointer"
+              >
+                Upload Photo
+              </button>
+              {previewImage && (
+                <button
+                  type="button"
+                  onClick={() => setPreviewImage(null)}
+                  className="text-sm text-red-400 hover:text-red-300 cursor-pointer"
+                >
+                  Delete Photo
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Username */}
