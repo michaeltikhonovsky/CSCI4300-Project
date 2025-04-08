@@ -82,7 +82,11 @@ const Leaderboard = () => {
         setIsLoading(true);
 
         // Fetch the top users
-        const response = await fetch("/api/users/leaderboard");
+        const response = await fetch(
+          user
+            ? `/api/users/leaderboard?userId=${user.id}`
+            : "/api/users/leaderboard"
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch leaderboard data");
         }
@@ -142,11 +146,13 @@ const Leaderboard = () => {
       </div>
 
       <header className="flex items-center justify-between px-4 py-2">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 z-10">
           <Link href="/">
-            <img
+            <Image
               src="/uga_bus_logo.png"
               alt="UGA Bus Logo"
+              width={64}
+              height={64}
               className="h-16 w-16 rounded-full object-cover border-2 border-white hover:border-blue-400 transition-colors"
             />
           </Link>
@@ -158,7 +164,7 @@ const Leaderboard = () => {
         ) : (
           <Link
             href="/auth"
-            className="no-cursor h-[48px] group relative flex items-center gap-2 overflow-hidden rounded-lg border-2 border-white bg-black/50 px-8 py-2 text-white transition-all hover:border-gray-300 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+            className="h-[48px] group relative flex items-center gap-2 overflow-hidden rounded-lg border-2 border-white bg-black/50 px-8 py-2 text-white transition-all hover:border-gray-300 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-green-950/5 0 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <span className="text-3xl">Join</span>
@@ -191,9 +197,7 @@ const Leaderboard = () => {
                   {currentUserRank && (
                     <>
                       {topUsers.length >= 5 && (
-                        <div className="flex items-center justify-center py-2">
-                          <div className="h-1 w-16 bg-gray-700 rounded-full"></div>
-                        </div>
+                        <div className="flex items-center justify-center"></div>
                       )}
                       <LeaderboardItem
                         rank={currentUserRank.rank}

@@ -89,7 +89,7 @@ export default function Home() {
       {/* Main Content */}
       <header className="flex items-center justify-between px-4 py-2">
         <Image
-          className="h-16 w-16 rounded-full border-2 border-white"
+          className="h-16 w-16 rounded-full border-2 border-white z-10"
           src="/uga_bus_logo.png"
           alt="UGA Bus Logo"
           width={100}

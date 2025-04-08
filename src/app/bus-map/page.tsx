@@ -4,6 +4,8 @@ import BusMap from "@/components/BusMap";
 import UserDropdown from "@/components/UserDropdown";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
+
 export default function BusMapPage() {
   const { user } = useAuth();
   return (
@@ -19,11 +21,13 @@ export default function BusMapPage() {
       </div>
 
       <header className="flex items-center justify-between px-4 py-2">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 z-10">
           <Link href="/">
-            <img
+            <Image
               src="/uga_bus_logo.png"
               alt="UGA Bus Logo"
+              width={64}
+              height={64}
               className="h-16 w-16 rounded-full object-cover border-2 border-white hover:border-blue-400 transition-colors"
             />
           </Link>

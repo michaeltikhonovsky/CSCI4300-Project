@@ -29,11 +29,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchUserData = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.user) {
+          return data.user;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error("AuthContext: Error fetching user data:", error);
+      return null;
+    }
+  };
+
   // Load user from localStorage on mount
   useEffect(() => {
-    const loadUser = () => {
+    const loadUser = async () => {
       setIsLoading(true);
       const storedUser = localStorage.getItem("user");
+
       if (storedUser) {
         try {
           const userData = JSON.parse(storedUser);
@@ -47,7 +64,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 : "path"
               : "none",
           });
+
+          // Set user initially from localStorage
           setUser(userData);
+
+          // Fetch fresh user data to ensure we have the latest points and other info
+          try {
+            const response = await fetch(`/api/users/${userData.id}`);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.user) {
+                const freshUserData = {
+                  ...userData,
+                  ...data.user,
+                };
+
+                console.log("AuthContext: Updated user data from API", {
+                  username: freshUserData.username,
+                  points: freshUserData.points,
+                });
+
+                // Update user state with fresh data
+                setUser(freshUserData);
+
+                // Update localStorage with fresh data
+                localStorage.setItem("user", JSON.stringify(freshUserData));
+              }
+            }
+          } catch (fetchError) {
+            console.error(
+              "AuthContext: Error fetching fresh user data:",
+              fetchError
+            );
+            // Keep using the localStorage data if fetch fails
+          }
         } catch (error) {
           console.error("AuthContext: Error parsing user data:", error);
           localStorage.removeItem("user");
@@ -60,6 +110,56 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     loadUser();
   }, []);
+
+  // Periodically update user points every 30 seconds
+  useEffect(() => {
+    if (!user) return;
+
+    const updateUserPoints = async () => {
+      const freshUserData = await fetchUserData(user.id);
+      if (freshUserData) {
+        const updatedUser = {
+          ...user,
+          points: freshUserData.points,
+        };
+
+        // Only update if points have changed
+        if (user.points !== freshUserData.points) {
+          console.log("AuthContext: Updated user points", {
+            oldPoints: user.points,
+            newPoints: freshUserData.points,
+          });
+
+          // Update user state with new points
+          setUser(updatedUser);
+
+          // Update localStorage
+          try {
+            const storedUser = localStorage.getItem("user");
+            if (storedUser) {
+              const userData = JSON.parse(storedUser);
+              userData.points = freshUserData.points;
+              localStorage.setItem("user", JSON.stringify(userData));
+            }
+          } catch (error) {
+            console.error(
+              "AuthContext: Error updating user in localStorage:",
+              error
+            );
+          }
+        }
+      }
+    };
+
+    // Initial update
+    updateUserPoints();
+
+    // Set up interval for periodic updates
+    const intervalId = setInterval(updateUserPoints, 30000); // 30 seconds
+
+    // Cleanup interval on unmount or when user changes
+    return () => clearInterval(intervalId);
+  }, [user]);
 
   const login = (userData: User) => {
     // Ensure userData has all required fields
