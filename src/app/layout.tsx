@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { TRPCProvider } from "@/utils/trpc-provider";
 import { gaegu } from "@/lib/font";
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
   title: "UGA Bus Tracker",
@@ -20,7 +21,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${gaegu.variable}`}>
       <body className={"font-gaegu"}>
-        <TRPCProvider>{children}</TRPCProvider>
+        <TRPCProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </TRPCProvider>
       </body>
     </html>
   );
