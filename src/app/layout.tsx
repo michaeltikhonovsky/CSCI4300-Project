@@ -4,6 +4,7 @@ import "./globals.css";
 import { TRPCProvider } from "@/utils/trpc-provider";
 import { gaegu } from "@/lib/font";
 import { AuthProvider } from "@/context/AuthContext";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "UGA Bus Tracker",
@@ -24,6 +25,7 @@ export default function RootLayout({
         <TRPCProvider>
           <AuthProvider>{children}</AuthProvider>
         </TRPCProvider>
+        <Toaster />
       </body>
     </html>
   );

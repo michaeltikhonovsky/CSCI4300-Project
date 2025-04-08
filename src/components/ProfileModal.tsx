@@ -3,6 +3,7 @@
 import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import ProfileAvatar from "./ProfileAvatar";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -76,6 +77,7 @@ const compressImage = (
 
 export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const { user, updateProfile } = useAuth();
+  const { toast } = useToast();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -146,6 +148,14 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
       // Set the compressed image as preview
       setPreviewImage(compressedImage);
+
+      // Show success toast for profile picture update
+      toast({
+        title: "Profile Picture Updated",
+        description:
+          "Your profile picture has been updated. Save changes to apply.",
+        variant: "success",
+      });
     } catch (err) {
       console.error("ProfileModal: Error compressing image:", err);
       setError("Failed to process the image. Please try a different one.");
@@ -188,6 +198,12 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         profilePicture?: string | null;
       } = {};
 
+      const updatedFields = {
+        username: false,
+        password: false,
+        profilePicture: false,
+      };
+
       if (username !== user.username) {
         console.log(
           "ProfileModal: Username changed from",
@@ -196,17 +212,20 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           username
         );
         updates.username = username;
+        updatedFields.username = true;
       }
 
       if (password) {
         console.log("ProfileModal: Password changed");
         updates.password = password;
+        updatedFields.password = true;
       }
 
       // Handle profile picture changes
       if (previewImage !== user.profilePicture) {
         console.log("ProfileModal: Profile picture changed");
         updates.profilePicture = previewImage;
+        updatedFields.profilePicture = true;
       }
 
       // Only update if there are changes
@@ -224,6 +243,33 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
               : updatedUser.profilePicture
             : null,
         });
+
+        // Show specific toasts based on what was updated
+        if (updatedFields.username) {
+          toast({
+            title: "Username Updated",
+            description: `Your username has been changed to ${username}`,
+            variant: "success",
+          });
+        }
+
+        if (updatedFields.password) {
+          toast({
+            title: "Password Updated",
+            description: "Your password has been successfully changed",
+            variant: "success",
+          });
+        }
+
+        if (updatedFields.profilePicture) {
+          toast({
+            title: "Profile Picture Saved",
+            description: previewImage
+              ? "Your new profile picture has been saved"
+              : "Your profile picture has been removed",
+            variant: "success",
+          });
+        }
       } else {
         console.log("ProfileModal: No changes to save");
       }
@@ -308,7 +354,16 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
               {previewImage && (
                 <button
                   type="button"
-                  onClick={() => setPreviewImage(null)}
+                  onClick={() => {
+                    setPreviewImage(null);
+                    // Show toast for deleted profile picture
+                    toast({
+                      title: "Profile Picture Removed",
+                      description:
+                        "Your profile picture has been removed. Save changes to apply.",
+                      variant: "default",
+                    });
+                  }}
                   className="text-sm text-red-400 hover:text-red-300 cursor-pointer"
                 >
                   Delete Photo
