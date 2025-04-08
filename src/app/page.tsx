@@ -148,7 +148,7 @@ const UserDropdown = () => {
                 setIsModalOpen(true);
                 setIsOpen(false);
               }}
-              className="no-cursor flex w-full items-center px-4 py-2 text-left text-sm text-white hover:bg-green-900/30"
+              className="no-cursor flex w-full items-center px-4 py-2 text-left text-sm text-white hover:bg-gray-400/30"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -171,7 +171,7 @@ const UserDropdown = () => {
                 logout();
                 setIsOpen(false);
               }}
-              className="no-cursor flex w-full items-center px-4 py-2 text-left text-sm text-white hover:bg-red-900/30"
+              className="no-cursor flex w-full items-center px-4 py-2 text-left text-sm text-white hover:bg-gray-400/30"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
