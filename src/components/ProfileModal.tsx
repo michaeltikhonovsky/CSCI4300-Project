@@ -361,7 +361,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                       title: "Profile Picture Removed",
                       description:
                         "Your profile picture has been removed. Save changes to apply.",
-                      variant: "default",
+                      variant: "success",
                     });
                   }}
                   className="text-sm text-red-400 hover:text-red-300 cursor-pointer"
