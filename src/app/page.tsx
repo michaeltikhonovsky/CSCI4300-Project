@@ -110,9 +110,17 @@ export default function Home() {
         <h1 className="mb-4 text-center text-6xl font-bold text-white md:text-9xl">
           UGA Bus Tracker
         </h1>
-        <p className="text-center text-white mb-8 text-2xl">
-          Bet on the over/under of the UGA buses' arrival time!
+        <p className="text-center text-white mb-1 text-2xl">
+          Sometimes the UGA busses are late. Sometimes they are early. <br />
+          This site lets you bet against the UGA buses' arrival time! <br />
         </p>
+        <p className="text-center text-white/80 mb-6 text-xl font-light">
+          Predict whether buses will arrive earlier or later than scheduled,{" "}
+          <br />
+          earn points for accurate predictions, and compete with other students
+          on the leaderboard.
+        </p>
+
         <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-3">
           <Link
             href="/bus-map"
