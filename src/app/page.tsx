@@ -111,7 +111,7 @@ export default function Home() {
           UGA Bus Tracker
         </h1>
         <p className="text-center text-white mb-8 text-2xl">
-          Bet on whether or not the UGA buses will arrive on time!
+          Bet on the over/under of the UGA buses' arrival time!
         </p>
         <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-3">
           <Link
