@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getRandomBusToStopETA } from "@/lib/passiogo/get_eta";
 import { useBetContext } from "./BusMap";
+import { useToast } from "@/hooks/use-toast";
 
 interface BetResult {
   success: boolean;
@@ -27,6 +28,7 @@ interface BetResult {
 export default function BusBetWidget() {
   const { user, setUser } = useAuth();
   const { etaInfo, setEtaInfo } = useBetContext();
+  const { toast } = useToast();
   const [timeRemaining, setTimeRemaining] = useState<number>(15);
   const [isLoading, setIsLoading] = useState(false);
   const [isBetting, setIsBetting] = useState(false);
@@ -50,7 +52,14 @@ export default function BusBetWidget() {
     setIsBetting(false);
 
     try {
-      const eta = await getRandomBusToStopETA(3994);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out")), 15000)
+      );
+
+      const etaPromise = getRandomBusToStopETA(3994);
+
+      const eta = (await Promise.race([etaPromise, timeoutPromise])) as any;
+
       if (eta) {
         setEtaInfo(eta);
         setTimeRemaining(15);
@@ -73,13 +82,36 @@ export default function BusBetWidget() {
           fakeShouldBeOver
         );
         setFakeETA(fakeDuration);
+      } else {
+        // If no eta was returned but no error was thrown
+        console.error("No valid ETA data received");
+        toast({
+          title: "Error",
+          description: "Could not get bus data. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error getting ETA:", error);
+
+      if (error instanceof Error && error.message === "Request timed out") {
+        toast({
+          title: "Bus Data Timeout",
+          description:
+            "Bus data is taking too long to load. This could be due to server load or network issues. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to get bus data. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [setEtaInfo]);
+  }, [setEtaInfo, toast]);
 
   // check user's remaining bets for today
   const checkRemainingBets = useCallback(async () => {
@@ -180,9 +212,15 @@ export default function BusBetWidget() {
     };
 
     try {
+      // get token from localStorage
+      const token = localStorage.getItem("token");
+
       const response = await fetch("/api/bets", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           userId: user.id,
           busName: etaInfo.vehicleName,
