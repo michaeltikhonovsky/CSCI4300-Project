@@ -51,14 +51,14 @@ export default function BusBetWidget() {
     setHasPlacedBet(false);
     setIsBetting(false);
 
+    // Add timeout to prevent infinite loading
+    const timeoutPromise = new Promise<null>((_, reject) =>
+      setTimeout(() => reject(new Error("Request timed out")), 15000)
+    );
+
     try {
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out")), 15000)
-      );
-
       const etaPromise = getRandomBusToStopETA(3994);
-
-      const eta = (await Promise.race([etaPromise, timeoutPromise])) as any;
+      const eta = await Promise.race([etaPromise, timeoutPromise]);
 
       if (eta) {
         setEtaInfo(eta);
@@ -94,20 +94,11 @@ export default function BusBetWidget() {
     } catch (error) {
       console.error("Error getting ETA:", error);
 
-      if (error instanceof Error && error.message === "Request timed out") {
-        toast({
-          title: "Bus Data Timeout",
-          description:
-            "Bus data is taking too long to load. This could be due to server load or network issues. Please try again.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to get bus data. Please try again.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Error",
+        description: "Failed to get bus data. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -388,7 +379,16 @@ export default function BusBetWidget() {
                     </button>
                   </div>
                 ) : (
-                  <p>Time's up! Try again.</p>
+                  <div>
+                    <p className="mb-4">Time's up!</p>
+                    <button
+                      onClick={fetchRandomETA}
+                      disabled={isLoading}
+                      className="px-6 py-3 bg-yellow-500 text-black font-bold rounded-full hover:bg-yellow-400 disabled:bg-gray-500 disabled:text-gray-300"
+                    >
+                      {isLoading ? "Loading..." : "Start New Bet"}
+                    </button>
+                  </div>
                 )}
               </>
             ) : (
