@@ -9,9 +9,9 @@ export async function GET(
   try {
     await connectMongoDB();
 
-    const userId = params.id;
+    const { id } = params;
 
-    const user = await User.findById(userId).select(
+    const user = await User.findById(id).select(
       "username points profilePicture"
     );
 

@@ -1,13 +1,26 @@
 "use client";
 
-import BusMap from "@/components/BusMap";
+import BusMap, { BetContext } from "@/components/BusMap";
+import BusBetWidget from "@/components/BusBetWidget";
 import UserDropdown from "@/components/UserDropdown";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
+import { useState } from "react";
+
+interface ETAInfo {
+  duration: string;
+  distance: string;
+  vehicleName: string;
+  stopName: string;
+  directions?: any;
+  busId?: string | null;
+}
 
 export default function BusMapPage() {
   const { user } = useAuth();
+  const [etaInfo, setEtaInfo] = useState<ETAInfo | null>(null);
+
   return (
     <div className="fixed inset-0 w-full bg-black">
       {/* Background Image with Vignette */}
@@ -39,7 +52,7 @@ export default function BusMapPage() {
         ) : (
           <Link
             href="/auth"
-            className="no-cursor h-[48px] group relative flex items-center gap-2 overflow-hidden rounded-lg border-2 border-white bg-black/50 px-8 py-2 text-white transition-all hover:border-gray-300 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+            className=" h-[48px] group relative flex items-center gap-2 overflow-hidden rounded-lg border-2 border-white bg-black/50 px-8 py-2 text-white transition-all hover:border-gray-300 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-green-950/5 0 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <span className="text-3xl">Join</span>
@@ -49,11 +62,16 @@ export default function BusMapPage() {
 
       {/* Main Content */}
       <div className="relative z-10 flex h-screen flex-col p-8">
-        <div className="flex justify-center w-full">
-          <div className="w-full max-w-6xl">
-            <BusMap />
+        <BetContext.Provider value={{ etaInfo, setEtaInfo }}>
+          <div className="flex flex-col md:flex-row gap-8 justify-center w-full">
+            <div className="w-full md:w-7/12">
+              <BusMap />
+            </div>
+            <div className="w-full md:w-5/12">
+              <BusBetWidget />
+            </div>
           </div>
-        </div>
+        </BetContext.Provider>
       </div>
     </div>
   );

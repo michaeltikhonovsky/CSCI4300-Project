@@ -18,7 +18,7 @@ const UserDropdown = () => {
     }
   }, [user]);
 
-  // Close dropdown when clicking outside
+  // close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

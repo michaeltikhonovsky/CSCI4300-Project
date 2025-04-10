@@ -10,7 +10,6 @@ interface ProfileModalProps {
   onClose: () => void;
 }
 
-// Helper function to compress an image before uploading
 const compressImage = (
   file: File,
   maxWidth = 250,
@@ -20,7 +19,6 @@ const compressImage = (
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = (event) => {
-      // Create an image element
       const img = document.createElement("img") as HTMLImageElement;
       if (event.target?.result) {
         img.src = event.target.result as string;
@@ -30,12 +28,10 @@ const compressImage = (
       }
 
       img.onload = () => {
-        // Create canvas
         const canvas = document.createElement("canvas");
         let width = img.width;
         let height = img.height;
 
-        // Calculate new dimensions to maintain aspect ratio
         if (width > height) {
           if (width > maxWidth) {
             height = Math.round((height * maxWidth) / width);
@@ -51,12 +47,10 @@ const compressImage = (
         canvas.width = width;
         canvas.height = height;
 
-        // Draw image to canvas
         const ctx = canvas.getContext("2d");
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Get compressed image as Data URL
           const dataUrl = canvas.toDataURL(file.type, 0.7);
           resolve(dataUrl);
         } else {
@@ -86,7 +80,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Update state when user changes
+  // update state when user changes
   useEffect(() => {
     if (user) {
       console.log("ProfileModal: User data loaded", {
@@ -102,7 +96,6 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     }
   }, [user]);
 
-  // Close modal with escape key
   useEffect(() => {
     const handleEscapeKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -125,13 +118,11 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
+    // validate file
     if (!file.type.match(/image\/(jpeg|jpg|png|gif)/i)) {
       setError("File must be an image (JPEG, PNG, or GIF)");
       return;
     }
-
-    // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
       setError("Image size should be less than 2MB");
       return;
@@ -140,16 +131,13 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     setError("");
 
     try {
-      // Compress the image to reduce size
+      // compress the image to reduce size
       setIsLoading(true);
       console.log("ProfileModal: Compressing image...");
       const compressedImage = await compressImage(file);
       console.log("ProfileModal: Image compressed successfully");
 
-      // Set the compressed image as preview
       setPreviewImage(compressedImage);
-
-      // Show success toast for profile picture update
       toast({
         title: "Profile Picture Updated",
         description:
@@ -221,14 +209,14 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         updatedFields.password = true;
       }
 
-      // Handle profile picture changes
+      // handle profile picture changes
       if (previewImage !== user.profilePicture) {
         console.log("ProfileModal: Profile picture changed");
         updates.profilePicture = previewImage;
         updatedFields.profilePicture = true;
       }
 
-      // Only update if there are changes
+      // only update if there are changes
       if (Object.keys(updates).length > 0) {
         console.log(
           "ProfileModal: Sending updates to server:",
@@ -244,7 +232,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             : null,
         });
 
-        // Show specific toasts based on what was updated
+        // show specific toasts based on what was updated
         if (updatedFields.username) {
           toast({
             title: "Username Updated",

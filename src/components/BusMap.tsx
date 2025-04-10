@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  createContext,
+  useContext,
+} from "react";
 import {
   GoogleMap,
   DirectionsRenderer,
   Marker,
   useJsApiLoader,
 } from "@react-google-maps/api";
-import { getRandomBusToStopETA } from "@/lib/passiogo/get_eta";
 import { LiveBusTracker } from "@/lib/passiogo/live_bus_tracking";
 
 interface ETAInfo {
@@ -24,6 +30,16 @@ interface BusLocation {
   lng: number;
 }
 
+export const BetContext = createContext<{
+  etaInfo: ETAInfo | null;
+  setEtaInfo: (info: ETAInfo | null) => void;
+}>({
+  etaInfo: null,
+  setEtaInfo: () => {},
+});
+
+export const useBetContext = () => useContext(BetContext);
+
 const containerStyle = {
   width: "100%",
   height: "500px",
@@ -36,22 +52,19 @@ const center = {
 };
 
 export default function BusMap() {
-  const [etaInfo, setEtaInfo] = useState<ETAInfo | null>(null);
+  const { etaInfo } = useBetContext();
   const [directions, setDirections] =
     useState<google.maps.DirectionsResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [busLocation, setBusLocation] = useState<BusLocation | null>(null);
   const [tracker, setTracker] = useState<LiveBusTracker | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [loadError, setLoadError] = useState<Error | null>(null);
 
-  // Use the useJsApiLoader hook instead of LoadScript component
   const { isLoaded, loadError: apiLoadError } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
   });
 
-  // Set loadError if API loading fails
   useEffect(() => {
     if (apiLoadError) {
       console.error("Error loading Google Maps API:", apiLoadError);
@@ -59,7 +72,6 @@ export default function BusMap() {
     }
   }, [apiLoadError]);
 
-  // Check if Google Maps API is already loaded
   useEffect(() => {
     if (typeof window !== "undefined" && window.google && window.google.maps) {
       setIsMapLoaded(true);
@@ -74,51 +86,39 @@ export default function BusMap() {
     };
   }, [tracker]);
 
-  const handleGetETA = async () => {
-    setIsLoading(true);
-    try {
+  useEffect(() => {
+    if (etaInfo) {
       if (tracker) {
         tracker.stop();
       }
 
-      const eta = await getRandomBusToStopETA(3994);
-      if (eta) {
-        setEtaInfo(eta);
-        if (eta.directions) {
-          setDirections(eta.directions);
-        }
-
-        const newTracker = new LiveBusTracker(
-          3994,
-          (buses) => {
-            const targetBus = buses.find((bus) => bus.name === eta.vehicleName);
-            if (targetBus?.latitude && targetBus?.longitude) {
-              setBusLocation({
-                lat: Number(targetBus.latitude),
-                lng: Number(targetBus.longitude),
-              });
-            }
-          },
-          500
-        );
-
-        setTracker(newTracker);
-        newTracker.start();
+      if (etaInfo.directions) {
+        setDirections(etaInfo.directions);
       }
-    } catch (error) {
-      console.error("Error getting ETA:", error);
-    } finally {
-      setIsLoading(false);
+
+      const newTracker = new LiveBusTracker(
+        3994,
+        (buses) => {
+          const targetBus = buses.find(
+            (bus) => bus.name === etaInfo.vehicleName
+          );
+          if (targetBus?.latitude && targetBus?.longitude) {
+            setBusLocation({
+              lat: Number(targetBus.latitude),
+              lng: Number(targetBus.longitude),
+            });
+          }
+        },
+        500
+      );
+
+      setTracker(newTracker);
+      newTracker.start();
     }
-  };
+  }, [etaInfo]);
 
   const handleMapLoad = useCallback(() => {
     setIsMapLoaded(true);
-  }, []);
-
-  const handleMapError = useCallback((error: Error) => {
-    console.error("Error loading Google Maps:", error);
-    setLoadError(error);
   }, []);
 
   if (loadError) {
@@ -158,29 +158,9 @@ export default function BusMap() {
         </GoogleMap>
       )}
 
-      <div className="mt-4 flex flex-col items-center gap-4">
-        {!isMapLoaded && isLoaded && (
-          <div className="text-white text-center">Initializing map...</div>
-        )}
-        {isMapLoaded && (
-          <button
-            onClick={handleGetETA}
-            disabled={isLoading}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-          >
-            {isLoading ? "Loading..." : "Get Random Bus ETA"}
-          </button>
-        )}
-
-        {etaInfo && (
-          <div className="p-4 bg-white rounded shadow">
-            <h3 className="font-bold mb-2 text-black">ETA Information</h3>
-            <p className="text-black">Stop: {etaInfo.stopName}</p>
-            <p className="text-black">Distance: {etaInfo.distance}</p>
-            <p className="text-black">Duration: {etaInfo.duration}</p>
-          </div>
-        )}
-      </div>
+      {!isMapLoaded && isLoaded && (
+        <div className="text-white text-center">Initializing map...</div>
+      )}
     </div>
   );
 }
