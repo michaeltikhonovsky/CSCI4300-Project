@@ -4,7 +4,6 @@ import User from "../../../models/User";
 import bcrypt from "bcryptjs";
 import { createToken } from "@/utils/auth";
 
-// Handle user signup and signin
 export async function POST(request: NextRequest) {
   try {
     const { username, password, action } = await request.json();
@@ -12,7 +11,7 @@ export async function POST(request: NextRequest) {
     await connectMongoDB();
 
     if (action === "signup") {
-      // Check if user already exists
+      // check if user already exists
       const existingUser = await User.findOne({ username });
       if (existingUser) {
         return NextResponse.json(
@@ -21,17 +20,15 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create new user
       const newUser = await User.create({
         username,
         password: hashedPassword,
         points: 0,
       });
 
-      // Generate JWT token
+      // generate JWT token
       const token = await createToken({
         userId: newUser._id.toString(),
         username: newUser.username,
@@ -51,7 +48,7 @@ export async function POST(request: NextRequest) {
         { status: 201 }
       );
     } else if (action === "signin") {
-      // Find user
+      // find user
       const user = await User.findOne({ username });
       if (!user) {
         return NextResponse.json(
@@ -60,7 +57,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Verify password
+      // verify password
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
         return NextResponse.json(
@@ -69,7 +66,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Generate JWT token
+      // generate JWT token
       const token = await createToken({
         userId: user._id.toString(),
         username: user.username,
@@ -100,7 +97,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Handle user profile updates
+// profile updates
 export async function PUT(request: NextRequest) {
   try {
     const { userId, updates } = await request.json();
@@ -110,7 +107,6 @@ export async function PUT(request: NextRequest) {
 
     await connectMongoDB();
 
-    // Find user by ID
     const user = await User.findById(userId);
     if (!user) {
       console.log("User not found:", userId);
@@ -119,9 +115,9 @@ export async function PUT(request: NextRequest) {
 
     console.log("User found in database:", user.username);
 
-    // Update fields that are provided
+    // update fields only if provided
     if (updates.username && updates.username !== user.username) {
-      // Check if new username is already taken
+      // check if new username is already taken
       const existingUser = await User.findOne({ username: updates.username });
       if (existingUser && existingUser._id.toString() !== userId) {
         return NextResponse.json(
@@ -140,20 +136,18 @@ export async function PUT(request: NextRequest) {
 
     if (updates.password) {
       console.log("Updating password for user:", user.username);
-      // Hash new password
       user.password = await bcrypt.hash(updates.password, 10);
     }
 
-    // Handle profile picture updates
+    // handle profile picture updates
     if (updates.profilePicture !== undefined) {
       console.log("Profile picture update requested");
 
-      // If it's null, remove the profile picture (reset to null)
+      // if it's null remove the profile picture
       if (updates.profilePicture === null) {
         console.log("Resetting profile picture to null");
         user.profilePicture = null;
       } else {
-        // Validate base64 image
         if (updates.profilePicture.startsWith("data:image/")) {
           const base64Data = updates.profilePicture.split(",")[1];
           if (base64Data) {
@@ -170,7 +164,6 @@ export async function PUT(request: NextRequest) {
               );
             }
 
-            // Store the image
             console.log(
               "Storing new profile picture (base64 length:",
               base64Data.length,
@@ -191,7 +184,7 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    // Save updated user
+    // save updated user
     console.log("Saving user updates to database...");
     await user.save();
     console.log("User updated successfully in database");

@@ -111,7 +111,7 @@ export default function Home() {
           UGA Bus Tracker
         </h1>
         <p className="text-center text-white mb-1 text-2xl">
-          Sometimes the UGA busses are late. Sometimes they are early. <br />
+          Sometimes the UGA buses are late. Sometimes they are early. <br />
           This site lets you bet against the UGA buses' arrival time! <br />
         </p>
         <p className="text-center text-white/80 mb-6 text-xl font-light">

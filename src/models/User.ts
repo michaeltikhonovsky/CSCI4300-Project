@@ -35,7 +35,7 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
-// Ensure profilePicture is always null when not explicitly set
+// ensure profilePicture is always null when not explicitly set
 UserSchema.pre("save", function (next) {
   if (this.isNew && this.profilePicture === undefined) {
     this.profilePicture = null;

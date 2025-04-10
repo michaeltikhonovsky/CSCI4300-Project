@@ -80,7 +80,6 @@ const Leaderboard = () => {
       try {
         setIsLoading(true);
 
-        // Fetch the top users
         const response = await fetch(
           user
             ? `/api/users/leaderboard?userId=${user.id}`
@@ -92,7 +91,6 @@ const Leaderboard = () => {
 
         const data = await response.json();
 
-        // Format the top users data
         const formattedUsers = data.users.map((user: any, index: number) => ({
           id: user._id,
           username: user.username,
@@ -103,8 +101,7 @@ const Leaderboard = () => {
 
         setTopUsers(formattedUsers);
 
-        // If there's a logged-in user and they're not in the top 5,
-        // find their rank
+        // if there's a user and they're not in the top 5 find their rank
         if (
           user &&
           !formattedUsers
