@@ -25,7 +25,7 @@ interface BetResult {
 }
 
 export default function BusBetWidget() {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { etaInfo, setEtaInfo } = useBetContext();
   const [timeRemaining, setTimeRemaining] = useState<number>(15);
   const [isLoading, setIsLoading] = useState(false);
@@ -167,7 +167,6 @@ export default function BusBetWidget() {
 
     setActualArrivalTime(`${actualMinutes} mins`);
 
-    // determine win/loss
     const actualIsUnder = actualMinutes < fakeMinutes;
     const userWon =
       (actualIsUnder && choice === "under") ||
@@ -199,6 +198,27 @@ export default function BusBetWidget() {
         const data = await response.json();
         setBetResult(data);
         setRemainingBets(data.remaining);
+
+        // Update user points in the header if bet was won
+        if (data.won && data.pointsAwarded > 0) {
+          const updatedPoints = user.points + data.pointsAwarded;
+          setUser({
+            ...user,
+            points: updatedPoints,
+          });
+
+          // Also update localStorage
+          try {
+            const storedUser = localStorage.getItem("user");
+            if (storedUser) {
+              const userData = JSON.parse(storedUser);
+              userData.points = updatedPoints;
+              localStorage.setItem("user", JSON.stringify(userData));
+            }
+          } catch (error) {
+            console.error("Error updating user points in localStorage:", error);
+          }
+        }
       } else {
         console.error("Bet failed:", await response.text());
       }

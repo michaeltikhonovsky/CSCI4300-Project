@@ -21,6 +21,7 @@ interface AuthContextType {
   login: (user: User) => void;
   logout: () => void;
   updateProfile: (updates: ProfileUpdates) => Promise<User>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -316,7 +317,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, login, logout, updateProfile }}
+      value={{ user, isLoading, login, logout, updateProfile, setUser }}
     >
       {children}
     </AuthContext.Provider>
