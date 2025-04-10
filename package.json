@@ -25,6 +25,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.6.3",
     "install": "^0.13.0",
+    "jose": "^6.0.10",
     "lodash": "^4.17.21",
     "lucide-react": "^0.486.0",
     "mongodb": "^6.15.0",

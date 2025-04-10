@@ -161,7 +161,6 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     setError("");
     console.log("ProfileModal: Starting form submission");
 
-    // Validate password if changing
     if (password && password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -344,7 +343,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                   type="button"
                   onClick={() => {
                     setPreviewImage(null);
-                    // Show toast for deleted profile picture
+                    // show toast for deleted profile picture
                     toast({
                       title: "Profile Picture Removed",
                       description:

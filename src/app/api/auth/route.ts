@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectMongoDB from "../../../../config/mongodb";
 import User from "../../../models/User";
 import bcrypt from "bcryptjs";
+import { createToken } from "@/utils/auth";
 
 // Handle user signup and signin
 export async function POST(request: NextRequest) {
@@ -30,6 +31,12 @@ export async function POST(request: NextRequest) {
         points: 0,
       });
 
+      // Generate JWT token
+      const token = await createToken({
+        userId: newUser._id.toString(),
+        username: newUser.username,
+      });
+
       return NextResponse.json(
         {
           message: "User created successfully",
@@ -39,6 +46,7 @@ export async function POST(request: NextRequest) {
             points: newUser.points,
             profilePicture: newUser.profilePicture,
           },
+          token,
         },
         { status: 201 }
       );
@@ -61,6 +69,12 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Generate JWT token
+      const token = await createToken({
+        userId: user._id.toString(),
+        username: user.username,
+      });
+
       return NextResponse.json(
         {
           message: "Login successful",
@@ -70,6 +84,7 @@ export async function POST(request: NextRequest) {
             points: user.points,
             profilePicture: user.profilePicture,
           },
+          token,
         },
         { status: 200 }
       );

@@ -5,33 +5,45 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AuthPage() {
   const router = useRouter();
   const { login } = useAuth();
+  const { toast } = useToast();
   const [isSignUp, setIsSignUp] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
 
     if (isSignUp && password !== confirmPassword) {
-      setError("Passwords do not match");
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
       return;
     }
 
     if (username.length < 3) {
-      setError("Username must be at least 3 characters");
+      toast({
+        title: "Error",
+        description: "Username must be at least 3 characters",
+        variant: "destructive",
+      });
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+      toast({
+        title: "Error",
+        description: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -55,13 +67,31 @@ export default function AuthPage() {
         throw new Error(data.error || "Authentication failed");
       }
 
-      // Use the login function from auth context
-      login(data.user);
+      // Use the login function from auth context with user and token
+      login({
+        user: data.user,
+        token: data.token,
+      });
+
+      // Show success toast
+      toast({
+        title: isSignUp ? "Account Created" : "Signed In",
+        description: isSignUp
+          ? `Welcome, ${username}! Your account has been created successfully.`
+          : `Welcome back, ${username}!`,
+        variant: "success",
+      });
 
       // Redirect to homepage
       router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Authentication failed");
+      const errorMessage =
+        err instanceof Error ? err.message : "Authentication failed";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -109,12 +139,6 @@ export default function AuthPage() {
           <h1 className="mb-6 text-center text-3xl font-bold text-white">
             {isSignUp ? "Create Account" : "Sign In"}
           </h1>
-
-          {error && (
-            <div className="mb-4 rounded-md bg-red-500/20 p-3 text-red-400">
-              {error}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit}>
             <div className="mb-4">

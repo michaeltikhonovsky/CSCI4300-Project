@@ -9,6 +9,11 @@ type User = {
   profilePicture?: string | null;
 };
 
+type AuthData = {
+  user: User;
+  token: string;
+};
+
 type ProfileUpdates = {
   username?: string;
   password?: string;
@@ -17,8 +22,9 @@ type ProfileUpdates = {
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   isLoading: boolean;
-  login: (user: User) => void;
+  login: (authData: AuthData) => void;
   logout: () => void;
   updateProfile: (updates: ProfileUpdates) => Promise<User>;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
@@ -28,11 +34,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUserData = async (userId: string) => {
     try {
-      const response = await fetch(`/api/users/${userId}`);
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`/api/users/${userId}`, { headers });
       if (response.ok) {
         const data = await response.json();
         if (data.user) {
@@ -51,8 +63,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const loadUser = async () => {
       setIsLoading(true);
       const storedUser = localStorage.getItem("user");
+      const storedToken = localStorage.getItem("token");
 
-      if (storedUser) {
+      if (storedUser && storedToken) {
         try {
           const userData = JSON.parse(storedUser);
           console.log("AuthContext: Loading user from localStorage", {
@@ -66,12 +79,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               : "none",
           });
 
-          // Set user initially from localStorage
+          // Set user and token initially from localStorage
           setUser(userData);
+          setToken(storedToken);
 
           // Fetch fresh user data to ensure we have the latest points and other info
           try {
-            const response = await fetch(`/api/users/${userData.id}`);
+            const headers = { Authorization: `Bearer ${storedToken}` };
+            const response = await fetch(`/api/users/${userData.id}`, {
+              headers,
+            });
             if (response.ok) {
               const data = await response.json();
               if (data.user) {
@@ -102,6 +119,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } catch (error) {
           console.error("AuthContext: Error parsing user data:", error);
           localStorage.removeItem("user");
+          localStorage.removeItem("token");
+          setToken(null);
         }
       } else {
         console.log("AuthContext: No stored user found in localStorage");
@@ -162,13 +181,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => clearInterval(intervalId);
   }, [user]);
 
-  const login = (userData: User) => {
+  const login = (authData: AuthData) => {
     // Ensure userData has all required fields
     const validatedUser: User = {
-      id: userData.id,
-      username: userData.username,
-      points: userData.points || 0,
-      profilePicture: userData.profilePicture || null,
+      id: authData.user.id,
+      username: authData.user.username,
+      points: authData.user.points || 0,
+      profilePicture: authData.user.profilePicture || null,
     };
 
     console.log("AuthContext: User logging in", {
@@ -183,10 +202,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     setUser(validatedUser);
+    setToken(authData.token);
 
     try {
       localStorage.setItem("user", JSON.stringify(validatedUser));
-      console.log("AuthContext: User data saved to localStorage");
+      localStorage.setItem("token", authData.token);
+      console.log("AuthContext: User data and token saved to localStorage");
     } catch (error) {
       console.error("AuthContext: Error saving user to localStorage:", error);
 
@@ -203,6 +224,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         };
         try {
           localStorage.setItem("user", JSON.stringify(userWithoutPicture));
+          localStorage.setItem("token", authData.token);
           console.log("AuthContext: User saved without profile picture");
         } catch (storageError) {
           console.error(
@@ -217,31 +239,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     console.log("AuthContext: User logging out");
     setUser(null);
+    setToken(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
   const updateProfile = async (updates: ProfileUpdates): Promise<User> => {
-    if (!user) {
-      throw new Error("No user logged in");
+    if (!user || !user.id) {
+      throw new Error("No user is currently logged in");
     }
 
-    console.log("AuthContext: Updating profile", {
+    console.log("AuthContext: Updating user profile", {
       userId: user.id,
-      updateFields: Object.keys(updates),
-      hasProfilePictureUpdate: "profilePicture" in updates,
-      profilePictureType: updates.profilePicture
-        ? updates.profilePicture.startsWith("data:image")
-          ? "base64"
-          : "path"
-        : "null",
+      updates: Object.keys(updates),
     });
 
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const response = await fetch("/api/auth", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify({
           userId: user.id,
           updates,
@@ -317,7 +341,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, login, logout, updateProfile, setUser }}
+      value={{
+        user,
+        token,
+        isLoading,
+        login,
+        logout,
+        updateProfile,
+        setUser,
+      }}
     >
       {children}
     </AuthContext.Provider>
