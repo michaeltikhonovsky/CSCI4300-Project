@@ -42,7 +42,7 @@ const UserDropdown = () => {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className=" flex items-center gap-2 rounded-lg border-2 border-white bg-black/50 px-4 py-2 text-white transition-all hover:border-gray-200 hover:shadow-white"
+          className=" flex items-center gap-2 rounded-lg border-2 border-white bg-black/50 px-4 py-2 text-white transition-all hover:border-gray-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
         >
           <div className="relative h-8 w-8 overflow-hidden rounded-full border border-white">
             {profilePic ? (
