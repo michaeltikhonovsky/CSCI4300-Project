@@ -118,6 +118,9 @@ const Leaderboard = () => {
               rank: currentUserData.rank,
             });
           }
+        } else {
+          // clear currentUserRank if user is in top 5 or no user
+          setCurrentUserRank(null);
         }
       } catch (error) {
         console.error("Error fetching leaderboard:", error);
