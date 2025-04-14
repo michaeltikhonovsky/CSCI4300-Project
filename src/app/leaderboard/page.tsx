@@ -91,13 +91,21 @@ const Leaderboard = () => {
 
         const data = await response.json();
 
-        const formattedUsers = data.users.map((user: any, index: number) => ({
-          id: user._id,
-          username: user.username,
-          points: user.points,
-          profilePicture: user.profilePicture,
-          rank: index + 1,
-        }));
+        let currentRank = 1;
+        const formattedUsers = data.users.map((user: any, index: number) => {
+          // if users have same points then list as same rank
+          if (index > 0 && user.points < data.users[index - 1].points) {
+            currentRank = index + 1;
+          }
+
+          return {
+            id: user._id,
+            username: user.username,
+            points: user.points,
+            profilePicture: user.profilePicture,
+            rank: currentRank,
+          };
+        });
 
         setTopUsers(formattedUsers);
 
