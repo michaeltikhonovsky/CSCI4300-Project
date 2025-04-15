@@ -24,40 +24,58 @@ const LeaderboardItem = ({
   user: LeaderboardUser;
   isCurrentUser?: boolean;
 }) => {
+  const [avatarSize, setAvatarSize] = useState(40);
+
+  useEffect(() => {
+    const updateSize = () => {
+      setAvatarSize(window.innerWidth >= 640 ? 64 : 40);
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
   return (
     <div
-      className={`group relative flex items-center gap-4 overflow-hidden rounded-lg border-2 ${
+      className={`group relative flex items-center gap-2 sm:gap-4 overflow-hidden rounded-lg border-2 ${
         isCurrentUser ? "border-green-500" : "border-white"
-      } bg-black/50 p-4 text-white transition-all`}
+      } bg-black/50 p-2 sm:p-4 text-white transition-all`}
     >
       <div
         className={`absolute inset-0 -z-10 bg-gradient-to-r  to-transparent opacity-0 transition-opacity `}
       />
 
       {/* Rank number */}
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-xl font-bold">
+      <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black text-lg sm:text-xl font-bold shrink-0">
         {rank}
       </div>
 
       {/* Profile image */}
       {user.profilePicture ? (
-        <img
-          src={user.profilePicture}
-          alt={user.username}
-          className="h-16 w-16 rounded-full object-cover border border-white"
-        />
+        <div className="h-10 w-10 sm:h-16 sm:w-16 shrink-0">
+          <img
+            src={user.profilePicture}
+            alt={user.username}
+            className="h-full w-full rounded-full object-cover border border-white"
+          />
+        </div>
       ) : (
-        <ProfileAvatar
-          username={user.username}
-          size={64}
-          className="border border-white"
-        />
+        <div className="h-10 w-10 sm:h-16 sm:w-16 shrink-0 flex items-center justify-center">
+          <ProfileAvatar
+            username={user.username}
+            size={avatarSize}
+            className="border border-white"
+          />
+        </div>
       )}
 
-      <div className="flex flex-1 items-center justify-between">
-        <h3 className="text-2xl font-bold">{user.username}</h3>
+      <div className="flex flex-1 items-center justify-between min-w-0">
+        <h3 className="text-lg sm:text-2xl font-bold truncate pr-2">
+          {user.username}
+        </h3>
         <span
-          className={`text-xl ${
+          className={`text-base sm:text-xl whitespace-nowrap ${
             isCurrentUser ? "text-green-400" : "text-white"
           }`}
         >
@@ -152,18 +170,21 @@ const Leaderboard = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black"></div>
       </div>
 
-      <header className="flex items-center justify-between px-4 py-2">
-        <div className="flex items-center gap-4 z-10">
+      {/* Header */}
+      <header className="relative z-20 flex items-center justify-between px-4 py-2">
+        <div className="flex items-center gap-4">
           <Link href="/">
             <Image
               src="/uga_bus_logo.png"
               alt="UGA Bus Logo"
               width={64}
               height={64}
-              className="h-16 w-16 rounded-full object-cover border-2 border-white hover:border-blue-400 transition-colors"
+              className="h-16 w-16 rounded-full border-2 border-white hover:border-blue-400 transition-colors"
             />
           </Link>
-          <h1 className="text-4xl font-bold text-white">Leaderboard</h1>
+          <h1 className="hidden sm:block text-3xl font-bold text-white">
+            Leaderboard
+          </h1>
         </div>
 
         {user ? (
