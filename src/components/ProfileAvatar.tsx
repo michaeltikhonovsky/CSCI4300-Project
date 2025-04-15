@@ -41,7 +41,6 @@ export default function ProfileAvatar({
           justifyContent: "center",
           width: "100%",
           height: "100%",
-          paddingRight: "2px",
         }}
       >
         {firstLetter}
