@@ -54,7 +54,7 @@ export default function BusMapPage() {
           <UserDropdown />
         ) : (
           <Link
-            href="/auth"
+            href="/auth?redirect=/bus-map"
             className="h-[48px] group relative flex items-center gap-2 overflow-hidden rounded-lg border-2 border-white bg-black/50 px-8 py-2 text-white transition-all hover:border-gray-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-green-950/5 0 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />

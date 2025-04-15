@@ -17,6 +17,15 @@ export default function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // redirect to previous page
+  const getRedirectUrl = () => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("redirect") || "/";
+    }
+    return "/";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -82,8 +91,8 @@ export default function AuthPage() {
         variant: "success",
       });
 
-      // Redirect to homepage
-      router.push("/");
+      // Redirect to the specified page or homepage
+      router.push(getRedirectUrl());
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Authentication failed";
