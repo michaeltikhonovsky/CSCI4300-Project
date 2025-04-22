@@ -29,6 +29,7 @@ export async function POST(
       );
     }
 
+    // Don't do anything until connected to the DB
     await connectMongoDB();
 
     const { id } = params;
@@ -42,6 +43,7 @@ export async function POST(
       );
     }
 
+    // Points have to be a numerical value
     if (typeof points !== "number") {
       return NextResponse.json(
         { error: "Points must be a number" },
@@ -49,6 +51,7 @@ export async function POST(
       );
     }
 
+    // Wait for user to
     const user = await User.findById(id);
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
