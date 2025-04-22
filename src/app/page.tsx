@@ -118,7 +118,7 @@ export default function Home() {
           Predict whether buses will arrive earlier or later than scheduled,{" "}
           <br />
           earn points for accurate predictions, and compete with other students
-          on the leaderboard.
+          to get the highest score on the leaderboard!
         </p>
 
         <div className="mx-auto flex max-w-xl flex-wrap items-center justify-center gap-3">
