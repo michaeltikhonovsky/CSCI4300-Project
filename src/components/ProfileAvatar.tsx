@@ -1,5 +1,6 @@
 import React from "react";
 
+// Profile basics
 interface ProfileAvatarProps {
   username: string;
   size?: number;
