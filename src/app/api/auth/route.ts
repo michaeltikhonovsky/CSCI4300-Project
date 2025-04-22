@@ -4,6 +4,7 @@ import User from "../../../models/User";
 import bcrypt from "bcryptjs";
 import { createToken } from "@/utils/auth";
 
+// Connect to database
 export async function POST(request: NextRequest) {
   try {
     const { username, password, action } = await request.json();
