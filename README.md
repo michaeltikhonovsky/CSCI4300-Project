@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app). A unique, interactive platform designed for UGA students that combines real-time campus bus tracking with a fun, predictive betting experience. By integrating live bus tracking data, it allows students to monitor UGA buses' arrival and departure times across various routes. Students can then place friendly, non-monetary bets on bus arrival times, testing their prediction skills and competing with friends for leaderboard rankings and rewards.
 
 ## Getting Started
 
