@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 
+// How user works
 interface IUser extends Document {
   username: string;
   password: string;

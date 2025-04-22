@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, extractTokenFromHeader } from "./utils/auth";
 
 const PROTECTED_ROUTES = ["/api/users/*/points", "/api/bets", "/api/auth"];
+// Connecting to the servers
 
 export async function middleware(request: NextRequest) {
   const isProtectedRoute = PROTECTED_ROUTES.some((route) => {
