@@ -249,7 +249,30 @@ export default function BusBetWidget() {
           }
         }
       } else {
-        console.error("Bet failed:", await response.text());
+        const errorData = await response.json();
+        console.error("Bet failed:", errorData);
+
+        // Handle authentication errors
+        if (response.status === 401) {
+          toast({
+            title: "Authentication Error",
+            description: "Your session has expired. Please log in again.",
+            variant: "destructive",
+          });
+          // Reset bet state
+          setHasPlacedBet(false);
+          setBetChoice(null);
+          setBetResult(null);
+          return;
+        }
+
+        // Handle other errors
+        toast({
+          title: "Error",
+          description:
+            errorData.error || "Failed to place bet. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error placing bet:", error);
